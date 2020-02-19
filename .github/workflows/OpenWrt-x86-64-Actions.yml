@@ -6,12 +6,12 @@
 # Blog: https://p3terx.com
 #=================================================
 
-name: OpenWrt- x86-64-Actions
+name: OpenWrt-x86-64-Actions
 
 on:
 # 定时触发
-  schedule:
-    - cron: 0 22 * * *
+#  schedule:
+#    - cron: 0 22 * * *
 
 # release触发
   release:
