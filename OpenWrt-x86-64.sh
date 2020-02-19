@@ -21,10 +21,10 @@ git clone https://github.com/Aslin-Ameng/luci-theme-Light.git package/luci-theme
 git clone https://github.com/docker/docker-ce.git package/docker-ce-master
 
 # uci-app-dockerman && diskman
-git clone https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
-git clone https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
-git clone https://github.com/lisaac/luci-app-diskman package/luci-app-diskman
-mkdir -p package/parted && cp -i package/luci-app-diskman/Parted.Makefile package/parted/Makefile
+#git clone https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
+#git clone https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+#git clone https://github.com/lisaac/luci-app-diskman package/luci-app-diskman
+#mkdir -p package/parted && cp -i package/luci-app-diskman/Parted.Makefile package/parted/Makefile
 
 #创建自定义配置文件 - OpenWrt-x86-64
 

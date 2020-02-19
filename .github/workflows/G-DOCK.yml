@@ -47,6 +47,7 @@ env:
 
 jobs:
   build:
+    if: github.event.repository.owner.id == github.event.sender.id
     runs-on: ubuntu-latest
 
     steps:
@@ -81,7 +82,7 @@ jobs:
     - name: 安装源
       run: cd openwrt && ./scripts/feeds install -a
 
-    - name: 创建自定义配置文件 - OpenWrt-x86-64
+    - name: 创建自定义配置文件 - G-DOCK
       run: |
         [ -e files ] && mv files openwrt/files
         chmod +x $DIY_SH
