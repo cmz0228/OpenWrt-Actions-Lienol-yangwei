@@ -11,19 +11,15 @@ name: OpenWrt-x86-64-Actions
 on:
 # 定时触发
   schedule:
-    - cron: 0 22 * * *
+    - cron: 0 15 * * *
 
 # release触发
-  release:
-    types: [published]
-    
-  # 点赞触发
-  watch:
-    types: [started]  
+#  release:
+#    types: [published]
 
 # 点赞触发
-#  watch:
-#    types: [started]
+  watch:
+   types: [started]
 
 # 编辑触发
 #  push:
@@ -34,25 +30,9 @@ on:
 #  paths:
 #    - 'x86_64.config'
 
-#FREE_UP_DISK 释放磁盘空间
-#SSH_ACTIONS 开启SSH连接
-#UPLOAD_BIN_DIR上传BIN目录
-#UPLOAD_FIRMWARE上传固件目录
-
-env:
-  REPO_URL: https://github.com/Lienol/openwrt
-  REPO_BRANCH: dev-19.07
-  DIY_SH: OpenWrt-x86-64.sh
-  FREE_UP_DISK: false
-  SSH_ACTIONS: false
-  UPLOAD_BIN_DIR: true
-  UPLOAD_FIRMWARE: true
-  TZ: Asia/Shanghai
-
 jobs:
   build:
-    if: github.event.repository.owner.id == github.event.sender.id
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - name: 校验本地文件
@@ -62,22 +42,23 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+        echo "Deleting files, please wait ..."
+        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d/*
         sudo swapoff /swapfile
-        sudo rm -rf /swapfile /etc/apt/sources.list.d/*
+        sudo rm -f /swapfile
+        #docker rmi `docker images -q`
+        #sudo -E apt-get -q purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
-        curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
-    - name: 释放磁盘空间
-      if: env.FREE_UP_DISK == 'true'
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo rm -rf /usr/share/dotnet
-        docker rmi `docker images -q`
-        sudo -E apt-get -q purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
+        curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
+        sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
     - name: 克隆源代码
+      env: 
+        REPO_URL: https://github.com/Lienol/openwrt
+        REPO_BRANCH: dev-19.07
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
     - name: 更新源
@@ -87,44 +68,51 @@ jobs:
       run: cd openwrt && ./scripts/feeds install -a
 
     - name: 创建自定义配置文件 - OpenWrt-x86-64
+      env:
+        DIY_SH: 'OpenWrt-x86-64.sh'
       run: |
         [ -e files ] && mv files openwrt/files
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
         make defconfig
-    - name: 开启SSH远程连接
-      uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
+
+#      开启SSH远程连接
+#    - name: SSH connection to Actions
+#      uses: P3TERX/debugger-action@master
 
     - name: 下载软件包
-      id: package
       run: |
         cd openwrt && make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    - name: 编译固件
-      id: compile
+
+    - name: 多线程编译
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 V=s
-        echo "::set-output name=status::success"
+        make -j$(nproc)
+
+    - name: 多线程编译失败，尝试单线程编译
+      if: failure()
+      run: |
+        cd openwrt
+        make -j1 V=s
+
     - name: 上传BIN目录
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      if: always()
       with:
         name: OpenWrt_bin
         path: openwrt/bin
 
     - name: 整理文件
-      id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./artifact/
           find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
+
     - name: 上传固件
       uses: actions/upload-artifact@master
       with:
