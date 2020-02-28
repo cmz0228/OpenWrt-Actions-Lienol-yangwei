@@ -17,8 +17,9 @@ git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat.git package/luci-th
 #git clone https://github.com/Leo-Jo-My/luci-theme-leo.git package/luci-theme-leo
 git clone https://github.com/Aslin-Ameng/luci-theme-Night.git package/luci-theme-Night
 git clone https://github.com/Aslin-Ameng/luci-theme-Light.git package/luci-theme-Light
-git clone https://github.com/coolsnowwolf/lede.git package/lede
-git clone https://github.com/Leo-Jo/luci-app-vssr-coexist package/luci-app-vssr-coexist
+#git clone https://github.com/coolsnowwolf/lede.git package/lede
+git clone https://github.com/Flowers-in-thorns/luci-app-vssr-coexist.git package/luci-app-vssr-coexist
+#git clone https://github.com/Leo-Jo/luci-app-vssr-coexist package/luci-app-vssr-coexist
 git clone https://github.com/docker/docker-ce.git package/docker-ce-master
 
 # uci-app-dockerman && diskman
@@ -120,17 +121,17 @@ CONFIG_PACKAGE_luci-app-smartinfo=y #磁盘健康监控
 EOF
 
 # ShadowsocksR插件:
-cat >> .config <<EOF
-CONFIG_PACKAGE_luci-app-ssr-plus=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Simple_obfs=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray_plugin=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Server=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Socks=y
-EOF
+#cat >> .config <<EOF
+#CONFIG_PACKAGE_luci-app-ssr-plus=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Simple_obfs=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray_plugin=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Server=y
+#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Socks=y
+#EOF
 
 # Passwall插件:
 cat >> .config <<EOF
